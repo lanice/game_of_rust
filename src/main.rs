@@ -9,9 +9,11 @@ use std::thread;
 use std::fs::File;
 use std::io::Read;
 
-// use std::io::Cursor;
-
 use glium::{DisplayBuild, Surface};
+
+
+const GRID_SIZE: usize = 31;
+const ITERATION_SPEED: u64 = 100;
 
 
 #[derive(Copy, Clone)]
@@ -44,6 +46,41 @@ fn geometry() -> (Vec<Vertex>) {
 //     glium::Program::from_source(&display, &mut vertex_shader_src, &mut fragment_shader_src, None).unwrap()
 // }
 
+fn game_board_start_config() -> Vec<Vec<bool>> {
+    let mut game_board = vec![ vec![ false ; GRID_SIZE ] ; GRID_SIZE ];
+
+    let index = GRID_SIZE / 2;
+
+    *game_board.get_mut(index-2).unwrap().get_mut(index).unwrap() = true;
+    *game_board.get_mut(index-1).unwrap().get_mut(index-1).unwrap() = true;
+    *game_board.get_mut(index-1).unwrap().get_mut(index+1).unwrap() = true;
+    *game_board.get_mut(index).unwrap().get_mut(index-1).unwrap() = true;
+    *game_board.get_mut(index).unwrap().get_mut(index).unwrap() = true;
+    *game_board.get_mut(index).unwrap().get_mut(index+1).unwrap() = true;
+    *game_board.get_mut(index+1).unwrap().get_mut(index).unwrap() = true;
+
+    game_board
+}
+
+fn texture_vec_from_board(board: &Vec<Vec<bool>>) -> Vec<Vec<(f32, f32, f32, f32)>> {
+    let mut tex_vec: Vec<Vec<(f32, f32, f32, f32)>> = Vec::<Vec<(f32, f32, f32, f32)>>::new();
+
+    for row in board {
+        tex_vec.push(Vec::new());
+
+        for &value in row {
+            tex_vec.last_mut().unwrap().push(
+                match value {
+                    true => (0.0, 0.0, 0.0, 0.0),
+                    false => (1.0, 1.0, 1.0, 1.0),
+                }
+            );
+        }
+    }
+
+    tex_vec
+}
+
 fn main() {
 
     let (monitor_width, monitor_height) = glium::glutin::get_primary_monitor().get_dimensions();
@@ -64,13 +101,8 @@ fn main() {
     let program = glium::Program::from_source(&display, &mut vertex_shader_src, &mut fragment_shader_src, None).unwrap();
 
 
-    // Texture
-    let tex = vec![
-        vec![(1.0, 1.0, 1.0, 1.0), (0.0, 0.0, 0.0, 1.0)],
-        vec![(0.0, 0.0, 0.0, 1.0), (1.0, 1.0, 1.0, 1.0)],
-    ];
-    let texture = glium::texture::Texture2d::new(&display, tex).unwrap();
-
+    let mut game_board = game_board_start_config();
+    
     // let tex = vec![(1.0, 0.0, 0.0, 1.0)];
     // let image = glium::texture::RawImage2d::from_raw_rgba(tex, (1, 1));
     // let texture = glium::texture::Texture2d::new(&display, image).unwrap();
@@ -78,14 +110,19 @@ fn main() {
 
 
     loop {
+
+        let tex = texture_vec_from_board(&game_board);
+        let texture = glium::texture::Texture2d::new(&display, tex).unwrap();
+        let sampler = glium::uniforms::Sampler::new(&texture)
+                        .wrap_function(glium::uniforms::SamplerWrapFunction::Clamp)
+                        .minify_filter(glium::uniforms::MinifySamplerFilter::Nearest)
+                        .magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest);
+
         let (width, height) = display.get_window().unwrap().get_inner_size_points().unwrap();
         let uniforms = uniform! {
             width: width as f32,
             height: height as f32,
-            tex: glium::uniforms::Sampler::new(&texture)
-                    .wrap_function(glium::uniforms::SamplerWrapFunction::Clamp)
-                    .minify_filter(glium::uniforms::MinifySamplerFilter::Nearest)
-                    .magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest)
+            tex: sampler
         };
 
         let mut target = display.draw();
@@ -93,7 +130,7 @@ fn main() {
         target.draw(&vertex_buffer, &indices, &program, &uniforms, &Default::default()).unwrap();
         target.finish().unwrap();
 
-        thread::sleep(Duration::from_millis(100));
+        thread::sleep(Duration::from_millis(ITERATION_SPEED));
 
 
         for ev in display.poll_events() {
