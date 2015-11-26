@@ -18,13 +18,13 @@ struct Vertex {
 
 
 fn setup_geometry() -> (Vec<Vertex>) {
-    let vertex1 = Vertex { position: [-0.5, -0.5] };
-    let vertex2 = Vertex { position: [ 0.5, -0.5] };
-    let vertex3 = Vertex { position: [ 0.5,  0.5] };
+    let vertex1 = Vertex { position: [-0.75, -0.75] };
+    let vertex2 = Vertex { position: [ 0.75, -0.75] };
+    let vertex3 = Vertex { position: [ 0.75,  0.75] };
 
-    let vertex4 = Vertex { position: [ 0.5,  0.5] };
-    let vertex5 = Vertex { position: [-0.5,  0.5] };
-    let vertex6 = Vertex { position: [-0.5, -0.5] };
+    let vertex4 = Vertex { position: [ 0.75,  0.75] };
+    let vertex5 = Vertex { position: [-0.75,  0.75] };
+    let vertex6 = Vertex { position: [-0.75, -0.75] };
 
     vec![vertex1, vertex2, vertex3, vertex4, vertex5, vertex6]
 }
