@@ -13,7 +13,8 @@ use glium::{DisplayBuild, Surface};
 
 
 const GRID_SIZE: usize = 31;
-const ITERATION_SPEED: u64 = 100;
+const ITERATION_SPEED: u64 = 500;
+const INITIAL_DELAY: u64 = 1000;
 
 
 #[derive(Copy, Clone)]
@@ -46,6 +47,38 @@ fn geometry() -> (Vec<Vertex>) {
 //     glium::Program::from_source(&display, &mut vertex_shader_src, &mut fragment_shader_src, None).unwrap()
 // }
 
+// fn is_cell_alive(board: & Vec<Vec<bool>>, row: usize, column: usize) -> Result<bool, &'static str> {
+fn is_cell_alive(board: & Vec<Vec<bool>>, row: usize, column: usize) -> bool {
+    match board.get(row) {
+        None => false,
+        Some(vec) => match vec.get(column) {
+            None | Some(&false) => false,
+            Some(&true) => true,
+        },
+    }
+}
+
+fn num_neighbours(board: & Vec<Vec<bool>>, row: usize, column: usize) -> u8 {
+    let mut count: u8 = 0;
+
+    if row > 0 && column > 0 {
+        if is_cell_alive(board, row-1, column-1) { count = count + 1; }
+    }
+    if row > 0 {
+        if is_cell_alive(board, row-1, column  ) { count = count + 1; }
+        if is_cell_alive(board, row-1, column+1) { count = count + 1; }
+    }
+    if column > 0 {
+        if is_cell_alive(board, row  , column-1) { count = count + 1; }
+        if is_cell_alive(board, row+1, column-1) { count = count + 1; }
+    }
+    if is_cell_alive(board, row  , column+1) { count = count + 1; }
+    if is_cell_alive(board, row+1, column  ) { count = count + 1; }
+    if is_cell_alive(board, row+1, column+1) { count = count + 1; }
+
+    count
+}
+
 fn game_board_start_config() -> Vec<Vec<bool>> {
     let mut game_board = vec![ vec![ false ; GRID_SIZE ] ; GRID_SIZE ];
 
@@ -62,7 +95,35 @@ fn game_board_start_config() -> Vec<Vec<bool>> {
     game_board
 }
 
-fn texture_vec_from_board(board: &Vec<Vec<bool>>) -> Vec<Vec<(f32, f32, f32, f32)>> {
+fn game_board_iterate(current: & Vec<Vec<bool>>) -> Vec<Vec<bool>> {
+    let mut next: Vec<Vec<bool>> = Vec::<Vec<bool>>::new();
+
+    for row_i in 0..GRID_SIZE-1 {
+        next.push(Vec::new());
+
+        for column_i in 0..GRID_SIZE-1 {
+            let neighbours: u8 = num_neighbours(&current, row_i, column_i);
+            let current_value: bool = *current.get(row_i).unwrap().get(column_i).unwrap();
+
+            next.last_mut().unwrap().push(
+                match current_value {
+                    true => match neighbours {
+                        2|3 => true,
+                        _ => false,
+                    },
+                    false => match neighbours {
+                        3 => true,
+                        _ => false,
+                    },
+                }
+            );
+        }
+    }
+
+    next
+}
+
+fn texture_vec_from_board(board: & Vec<Vec<bool>>) -> Vec<Vec<(f32, f32, f32, f32)>> {
     let mut tex_vec: Vec<Vec<(f32, f32, f32, f32)>> = Vec::<Vec<(f32, f32, f32, f32)>>::new();
 
     for row in board {
@@ -109,6 +170,8 @@ fn main() {
     // let texture = glium::texture::Texture2d::with_format(&display, tex, glium::texture::UncompressedFloatFormat::F32F32F32F32, glium::texture::MipmapsOption::NoMipmap).unwrap();
 
 
+    let mut delay = true;
+
     loop {
 
         let tex = texture_vec_from_board(&game_board);
@@ -130,8 +193,16 @@ fn main() {
         target.draw(&vertex_buffer, &indices, &program, &uniforms, &Default::default()).unwrap();
         target.finish().unwrap();
 
-        thread::sleep(Duration::from_millis(ITERATION_SPEED));
+        game_board = game_board_iterate(&game_board);
 
+
+        match delay {
+            true => {
+                delay = false;
+                thread::sleep(Duration::from_millis(INITIAL_DELAY));
+            },
+            false => thread::sleep(Duration::from_millis(ITERATION_SPEED))
+        }
 
         for ev in display.poll_events() {
             match ev {
