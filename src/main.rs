@@ -13,8 +13,8 @@ use glium::{DisplayBuild, Surface};
 
 
 const GRID_SIZE: usize = 31;
-const ITERATION_SPEED: u64 = 500;
-const INITIAL_DELAY: u64 = 1000;
+const ITERATION_SPEED: u64 = 200;
+const INITIAL_DELAY: u64 = 2000;
 
 
 #[derive(Copy, Clone)]
@@ -91,6 +91,14 @@ fn game_board_start_config() -> Vec<Vec<bool>> {
     *game_board.get_mut(index).unwrap().get_mut(index).unwrap() = true;
     *game_board.get_mut(index).unwrap().get_mut(index+1).unwrap() = true;
     *game_board.get_mut(index+1).unwrap().get_mut(index).unwrap() = true;
+
+    *game_board.get_mut(index-5-2).unwrap().get_mut(index).unwrap() = true;
+    *game_board.get_mut(index-5-1).unwrap().get_mut(index-1).unwrap() = true;
+    *game_board.get_mut(index-5-1).unwrap().get_mut(index+1).unwrap() = true;
+    *game_board.get_mut(index-5).unwrap().get_mut(index-1).unwrap() = true;
+    *game_board.get_mut(index-5).unwrap().get_mut(index).unwrap() = true;
+    *game_board.get_mut(index-5).unwrap().get_mut(index+1).unwrap() = true;
+    *game_board.get_mut(index-5+1).unwrap().get_mut(index).unwrap() = true;
 
     game_board
 }
