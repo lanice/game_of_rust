@@ -12,8 +12,8 @@ use std::io::Read;
 use glium::{DisplayBuild, Surface};
 
 
-const GRID_SIZE: usize = 31;
-const ITERATION_SPEED: u64 = 200;
+const GRID_SIZE: usize = 51;
+const ITERATION_SPEED: u64 = 100;
 const INITIAL_DELAY: u64 = 2000;
 
 
@@ -99,6 +99,30 @@ fn game_board_start_config() -> Vec<Vec<bool>> {
     *game_board.get_mut(index-5).unwrap().get_mut(index).unwrap() = true;
     *game_board.get_mut(index-5).unwrap().get_mut(index+1).unwrap() = true;
     *game_board.get_mut(index-5+1).unwrap().get_mut(index).unwrap() = true;
+
+    *game_board.get_mut(index+5-2).unwrap().get_mut(index).unwrap() = true;
+    *game_board.get_mut(index+5-1).unwrap().get_mut(index-1).unwrap() = true;
+    *game_board.get_mut(index+5-1).unwrap().get_mut(index+1).unwrap() = true;
+    *game_board.get_mut(index+5).unwrap().get_mut(index-1).unwrap() = true;
+    *game_board.get_mut(index+5).unwrap().get_mut(index).unwrap() = true;
+    *game_board.get_mut(index+5).unwrap().get_mut(index+1).unwrap() = true;
+    *game_board.get_mut(index+5+1).unwrap().get_mut(index).unwrap() = true;
+
+    *game_board.get_mut(index-2).unwrap().get_mut(index-3).unwrap() = true;
+    *game_board.get_mut(index-1).unwrap().get_mut(index-3-1).unwrap() = true;
+    *game_board.get_mut(index-1).unwrap().get_mut(index-3+1).unwrap() = true;
+    *game_board.get_mut(index).unwrap().get_mut(index-3-1).unwrap() = true;
+    *game_board.get_mut(index).unwrap().get_mut(index-3).unwrap() = true;
+    *game_board.get_mut(index).unwrap().get_mut(index-3+1).unwrap() = true;
+    *game_board.get_mut(index+1).unwrap().get_mut(index-3).unwrap() = true;
+
+    *game_board.get_mut(index-2).unwrap().get_mut(index+3).unwrap() = true;
+    *game_board.get_mut(index-1).unwrap().get_mut(index+3-1).unwrap() = true;
+    *game_board.get_mut(index-1).unwrap().get_mut(index+3+1).unwrap() = true;
+    *game_board.get_mut(index).unwrap().get_mut(index+3-1).unwrap() = true;
+    *game_board.get_mut(index).unwrap().get_mut(index+3).unwrap() = true;
+    *game_board.get_mut(index).unwrap().get_mut(index+3+1).unwrap() = true;
+    *game_board.get_mut(index+1).unwrap().get_mut(index+3).unwrap() = true;
 
     game_board
 }
