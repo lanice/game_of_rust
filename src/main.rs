@@ -1,7 +1,7 @@
 
 #[macro_use]
 extern crate glium;
-extern crate image;
+// extern crate image;
 
 use std::time::Duration;
 use std::thread;
