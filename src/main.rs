@@ -1,7 +1,7 @@
 
 #[macro_use]
 extern crate glium;
-// extern crate image;
+extern crate image;
 
 use std::time::Duration;
 use std::thread;
@@ -196,16 +196,37 @@ fn main() {
 
     let mut game_board = game_board_start_config();
     
-    // let tex = vec![(1.0, 0.0, 0.0, 1.0)];
-    // let image = glium::texture::RawImage2d::from_raw_rgba(tex, (1, 1));
-    // let texture = glium::texture::Texture2d::new(&display, image).unwrap();
-    // let texture = glium::texture::Texture2d::with_format(&display, tex, glium::texture::UncompressedFloatFormat::F32F32F32F32, glium::texture::MipmapsOption::NoMipmap).unwrap();
+
+// TEST AREA
+
+    // This should work, shouldn't it?
+    let problem_tex = vec![(1.0, 0.0, 0.0, 1.0)]; // One color (r,g,b,a) in the vec
+    let problem_image = glium::texture::RawImage2d::from_raw_rgba(problem_tex, (1, 1)); // texture dimension 1x1
+    let problem_texture = glium::texture::Texture2d::new(&display, problem_image).unwrap();
+
+
+    // // This instead DOES work, but why?
+    // let problem_tex = vec![(1.0, 0.0, 0.0, 1.0)]; // One color (r,g,b,a) in the vec
+    // let problem_image = glium::texture::RawImage2d::from_raw_rgba(problem_tex, (1, 4)); // texture dimension 1x4 ?!
+    // let problem_texture = glium::texture::Texture2d::new(&display, problem_image).unwrap();
+
+
+    // // This instead DOES work, but why?
+    // let problem_tex = vec![(1.0, 0.0, 0.0, 1.0)]; // One color (r,g,b,a) in the vec
+    // let problem_image = glium::texture::RawImage2d::from_raw_rgba(problem_tex, (4, 1)); // texture dimension 4x1 ?!
+    // let problem_texture = glium::texture::Texture2d::new(&display, problem_image).unwrap();
+
+
+    let problem_sampler = glium::uniforms::Sampler::new(&problem_texture);
+
+// END TEST AREA
 
 
     let mut delay = true;
 
     loop {
 
+// MODIFIED FOR TEST PURPOSE
         let tex = texture_vec_from_board(&game_board);
         let texture = glium::texture::Texture2d::new(&display, tex).unwrap();
         let sampler = glium::uniforms::Sampler::new(&texture)
@@ -217,8 +238,10 @@ fn main() {
         let uniforms = uniform! {
             width: width as f32,
             height: height as f32,
-            tex: sampler
+            // tex: sampler
+            tex: problem_sampler
         };
+// END MODIFIED FOR TEST PURPOSE
 
         let mut target = display.draw();
         target.clear_color(0.1, 0.2, 0.3, 1.0);

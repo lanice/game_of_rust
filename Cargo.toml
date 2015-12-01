@@ -5,3 +5,4 @@ authors = ["Leander Neiß <leander.neiss@student.hpi.uni-potsdam.de>"]
 
 [dependencies]
 glium = "*"
+image = "*"
