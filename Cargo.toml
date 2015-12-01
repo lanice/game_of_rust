@@ -1,5 +1,5 @@
 [package]
-name = "game_of_life"
+name = "game_of_rust"
 version = "0.1.0"
 authors = ["Leander Neiß <leander.neiss@student.hpi.uni-potsdam.de>"]
 

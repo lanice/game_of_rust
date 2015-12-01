@@ -1,5 +1,5 @@
 [root]
-name = "game_of_life"
+name = "game_of_rust"
 version = "0.1.0"
 dependencies = [
  "glium 0.12.2 (registry+https://github.com/rust-lang/crates.io-index)",
